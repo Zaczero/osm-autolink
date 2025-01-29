@@ -1,6 +1,7 @@
 import asyncio
 from datetime import UTC, datetime
 from itertools import batched
+from time import time
 
 from ai import find_link
 from config import OPENAI_RPM
@@ -10,6 +11,9 @@ from overpass import overpass_query
 
 
 async def main():
+    display_name = (await osm_authorized_user())['display_name']  # pyright: ignore [reportOptionalSubscript]
+    print(f'👤 Welcome, {display_name}!')
+
     print('Querying Overpass API')
     elements = await overpass_query()
 
@@ -41,35 +45,36 @@ async def main():
         items = [task.result() for task in tasks]
         db_insert(items)
 
-        print('Sleeping for 1 minute...')
-        await asyncio.sleep(60)
+        ts = time()
+        while True:
+            items = db_ready_to_upload()
+            if not items:
+                print('Nothing more to upload, bye!')
+                break
 
-    display_name = (await osm_authorized_user())['display_name']  # pyright: ignore [reportOptionalSubscript]
-    print(f'👤 Welcome, {display_name}!')
+            for i, item in enumerate(items):
+                type, id = item.id.split('/', 1)
+                print(
+                    f'🔗 [{i}] https://www.openstreetmap.org/{type}/{id} → {item.link}'
+                )
 
-    while True:
-        items = db_ready_to_upload()
-        if not items:
-            print('Nothing more to upload, bye!')
-            break
+            response = input('Proceed with uploading? (y/n/<ignore-number>) ')
+            if response.isdigit():
+                id = items[int(response)].id
+                print(f'Ignoring item [{response}] {id}')
+                db_mark_added([id])
+            elif response.lower() == 'n':
+                print('Aborting...')
+                return
+            elif response.lower() == 'y':
+                await upload_osmchange(items)
+                db_mark_added([item.id for item in items])
+                print('Done! Done! Done!')
+                break
 
-        for i, item in enumerate(items):
-            type, id = item.id.split('/', 1)
-            print(f'🔗 [{i}] https://www.openstreetmap.org/{type}/{id} → {item.link}')
-
-        response = input('Proceed with uploading? (y/n/<ignore-number>) ')
-        if response.isdigit():
-            id = items[int(response)].id
-            print(f'Ignoring item [{response}] {id}')
-            db_mark_added([id])
-        elif response.lower() == 'n':
-            print('Aborting...')
-            return
-        elif response.lower() == 'y':
-            await upload_osmchange(items)
-            db_mark_added([item.id for item in items])
-            print('Done! Done! Done!')
-            break
+        sleep_time = 65 - (time() - ts)
+        print(f'Sleeping for {sleep_time:.0f} seconds...')
+        await asyncio.sleep(sleep_time)
 
 
 if __name__ == '__main__':
