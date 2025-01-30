@@ -24,6 +24,8 @@ OVERPASS_API_INTERPRETER = os.getenv(
     'OVERPASS_API_INTERPRETER', 'https://overpass-api.de/api/interpreter'
 )
 
+NOMINATIM_URL = os.getenv('NOMINATIM_URL', 'https://nominatim.openstreetmap.org')
+
 # https://docs.perplexity.ai/guides/usage-tiers#rate-limits-and-usage-tiers
 OPENAI_RPM = int(os.getenv('OPENAI_RPM', 50))
 

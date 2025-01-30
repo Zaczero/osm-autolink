@@ -4,6 +4,6 @@ from config import USER_AGENT
 
 HTTP = AsyncClient(
     headers={'User-Agent': USER_AGENT},
-    timeout=30,
+    timeout=60,
     follow_redirects=True,
 )

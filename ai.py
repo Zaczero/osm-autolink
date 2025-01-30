@@ -16,9 +16,9 @@ async def find_link(query: str) -> str | None:
                 'content': (
                     'You try to find homepage websites for requested POIs. '
                     'Those links will be added to the POIs on OpenStreetMap. '
-                    'You must ignore non-exact matches and false positives! '
+                    'Avoid non-exact and false positive matches! '
                     "If there isn't a high-quality match, say nothing. "
-                    'If there is, say just the single best-matching fully qualified URL in plain text.'
+                    'If there is: say just the single best-matching fully-qualified URL in plain-text.'
                 ),
             },
             {

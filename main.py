@@ -55,7 +55,7 @@ async def main():
             for i, item in enumerate(items):
                 type, id = item.id.split('/', 1)
                 print(
-                    f'🔗 [{i}] https://www.openstreetmap.org/{type}/{id} → {item.link}'
+                    f'🔗 {i} -- https://www.openstreetmap.org/{type}/{id} → {item.link} -- {i}'
                 )
 
             response = input('Proceed with uploading? (y/n/<ignore-number>) ')
