@@ -1,7 +1,7 @@
 [project]
 dependencies = [
+  "google-genai",
   "httpx[brotli,zstd]",
-  "openai",
   "polars",
   "stamina",
   "xmltodict",
@@ -22,7 +22,9 @@ line-length = 88
 target-version = "py313"
 
 [tool.ruff.lint]
-ignore = []
+ignore = [
+  "S101", # assert
+]
 select = [
   # see https://docs.astral.sh/ruff/rules/ for rules documentation
   "A", # flake8-builtins

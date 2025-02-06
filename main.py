@@ -4,7 +4,7 @@ from itertools import batched
 from time import time
 
 from ai import find_link
-from config import OPENAI_RPM
+from config import BATCH_SIZE
 from db import DbItem, OsmId, db_filter, db_insert, db_mark_added, db_ready_to_upload
 from openstreetmap import osm_authorized_user, upload_osmchange
 from overpass import overpass_query
@@ -36,7 +36,7 @@ async def main():
             added=False,
         )
 
-    for batch in batched(elements.items(), OPENAI_RPM - 5):
+    for batch in batched(elements.items(), max(BATCH_SIZE - 3, 1)):
         print(f'Processing a batch of {len(batch)} elements')
         async with asyncio.TaskGroup() as tg:
             tasks = [tg.create_task(task(id, query)) for id, query in batch]
